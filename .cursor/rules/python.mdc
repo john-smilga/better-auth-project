@@ -1,0 +1,208 @@
+---
+globs: **/*.py
+alwaysApply: false
+---
+
+
+
+# .cursorrules – Python + Django + DRF
+
+These rules apply to all code written or modified in this repo.
+
+---
+
+# GENERAL
+
+- Make small, focused edits. Do not refactor multiple files at once unless explicitly requested.
+- Follow existing architecture, naming conventions, and folder structure.
+- Prefer clarity and readability over clever or compressed code.
+- Do not introduce new dependencies unless absolutely necessary; prefer stdlib, Django, or DRF.
+- When adding non-trivial logic or patterns, include brief docstrings or comments.
+
+---
+
+# PROJECT STRUCTURE
+
+- Keep Django apps **small and single-responsibility**.
+- Common app layout (follow if compatible with existing code):
+
+  - `models.py` or `models/`
+  - `serializers.py`
+  - `views.py` or `views/`
+  - `services.py` or `services/`
+  - `permissions.py`
+  - `urls.py`
+  - `tasks.py` (if background processing exists)
+
+- Do not create “god files”. If a file becomes too large, propose splitting into modules.
+- Never hardcode secrets, tokens, or environment-specific values. Use environment variables and settings.
+
+---
+
+# DJANGO & DRF RULES
+
+- This project exposes **JSON APIs**, not HTML templates. Prefer DRF views/viewsets, not Django template views.
+- Prefer **ViewSets** for standard CRUD endpoints.
+- Views must stay **thin**:
+  - No business rules in views.
+  - Views should orchestrate: authenticate → authorize → call service → serialize response.
+- Business logic must live in `services.py` or a clearly named domain/service module.
+- Use DRF **serializers** for:
+  - Input validation
+  - Output shaping
+  - Simple transformation logic
+- Do not embed complex business logic in serializers; push it into services.
+- Permissions:
+  - Use DRF permission classes.
+  - Place reusable permissions in `permissions.py`.
+  - Avoid inline permission logic in views.
+- Always return DRF `Response` objects with correct status codes.
+- Use pagination for list endpoints if returning more than trivial lists.
+
+---
+
+# TOOL AWARENESS (BLACK, RUFF, MYPY)
+
+- Always write code that **already conforms** to:
+  - `black .`
+  - `ruff check .`
+  - `mypy .`
+
+- Assume these tools will run after your changes. Avoid generating code that will obviously fail them.
+
+## Black
+
+- Format code according to Black style (e.g., 88-character lines, standard indentation).
+- Do not manually align arguments or do “pretty” vertical alignment that Black will undo.
+- Prefer simple, standard formatting that Black will keep as-is.
+
+## Ruff
+
+- Avoid:
+  - Unused imports
+  - Unused variables
+  - Wildcard imports (`from x import *`)
+  - Bare `except:`; always catch specific exceptions.
+- Keep imports organized: standard library → third-party → local modules.
+- Do not leave commented-out blocks of code unless explicitly requested.
+
+## MyPy
+
+- Use type hints on all **new or modified** functions, methods, and public interfaces.
+- Prefer explicit types over `Any` when feasible.
+- Avoid overly dynamic patterns that confuse static typing (e.g., `setattr`/`getattr` magic, dynamic attributes) unless necessary.
+- Use clear, predictable function signatures that MyPy can type-check.
+- If Django typing support (e.g., `django-stubs`) is present, follow existing patterns.
+
+---
+
+# MODELS & DATABASE
+
+- Any model change must have a corresponding Django migration.
+- Do not modify historical migrations unless absolutely unavoidable.
+- For large or risky schema changes, favor **backwards-compatible, multi-step migrations**.
+- For data migrations:
+  - Use `RunPython`.
+  - Make them idempotent and safe to re-run.
+  - Add short comments describing assumptions.
+
+---
+
+# BUSINESS LOGIC / SERVICES
+
+- All non-trivial domain/business rules must live in services or domain modules, not in:
+  - Views
+  - Serializers
+  - Signals
+- Services should be:
+  - Pure or side-effect-light where possible
+  - Easy to test
+  - Reused across multiple views/serializers when applicable
+- Prefer passing explicit arguments to services instead of reaching directly into request/session state inside them.
+
+---
+
+# URL ROUTING
+
+- Use DRF routers for ViewSets when appropriate.
+- Group URL patterns by app.
+- Use descriptive route names (e.g., `user-detail`, `order-list`, `category-products`) rather than generic names (`detail`, `list`).
+
+---
+
+# TESTING
+
+- For any non-trivial behavior change or new feature, add or update tests.
+- Test layers:
+  - Service functions (business logic)
+  - Serializers (validation and transformation)
+  - Views / API endpoints (permissions, responses, status codes)
+  - Model methods where applicable
+- Tests must be:
+  - Deterministic
+  - Isolated (no shared global state)
+  - Independent of external network calls (use fakes/mocks instead)
+- Prefer simple, descriptive test names that explain intent, not implementation details.
+
+---
+
+# SECURITY
+
+- Never log secrets, passwords, tokens, or other sensitive user data.
+- Use Django/DRF authentication and permission systems correctly; do not bypass them.
+- Validate all external input via serializers or forms.
+- Avoid returning internal error details to clients; surface only safe, user-facing messages.
+
+---
+
+# PERFORMANCE
+
+- Be aware of ORM performance:
+  - Use `select_related` / `prefetch_related` to avoid N+1 queries.
+  - Avoid doing heavy loops over QuerySets in Python if queries can be optimized.
+- For heavy or long-running operations, prefer background tasks (e.g., Celery, RQ, or existing task system) over request/response blocking work.
+- Paginate large responses and avoid sending huge payloads where unnecessary.
+
+---
+
+# LOGGING & OBSERVABILITY
+
+- Use Python’s `logging` module instead of `print`.
+- Log meaningful events at appropriate levels (`debug`, `info`, `warning`, `error`, `critical`).
+- Do not log sensitive data.
+- If observability tools (APM, metrics, tracing) are present, follow existing patterns when adding new instrumentation.
+
+---
+
+# DIFF REQUIREMENTS
+
+- All diffs and suggested changes must already:
+  - Conform to Black formatting.
+  - Avoid obvious Ruff violations.
+  - Be compatible with MyPy type checking.
+- Do not introduce:
+  - Unused imports or variables.
+  - Commented-out blocks of dead code.
+  - Temporary debug code (`print`, `pdb`, etc.).
+
+---
+
+# STRICT MODE (WHEN UNSURE)
+
+- Prefer **explicit** over **implicit**:
+  - Explicit imports, explicit types, explicit control flow.
+- Avoid highly dynamic or meta-programming constructs unless they match existing patterns.
+- Prefer simple, linear control flow that is easy to read and reason about.
+- If unsure about a construct’s interaction with Black/Ruff/MyPy, choose a simpler alternative.
+
+---
+
+# FALLBACK RULES
+
+- Prefer correctness + lint/type compliance over compactness or clever tricks.
+- Prefer consistency with the existing codebase over personal style.
+- Break complex work into small, reviewable steps.
+- When in doubt, choose the simplest implementation that:
+  - Respects these rules,
+  - Is easy to test,
+  - Should pass Black, Ruff, and MyPy.

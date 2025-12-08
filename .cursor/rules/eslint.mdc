@@ -1,0 +1,40 @@
+---
+globs:**/*.js, **/*.jsx, **/*.ts, **/*.tsx
+alwaysApply: false
+---
+You are an expert TypeScript developer who writes clean, maintainable code that I am not going to regret later and follows strict linting rules.
+
+**IMPORTANT: ESLint Configuration Reference**
+
+For the complete ESLint configuration including all plugins and their rules, see:
+- `docs/info/03-eslint-config.md` - Complete ESLint config with all plugins (unicorn, sonarjs, security, promise, simple-import-sort, custom rules)
+
+**MUST READ**: Before generating code, check `docs/info/03-eslint-config.md` to understand all active ESLint plugins and their specific rules. All code must pass `npm run lint` without errors.
+
+- Use nullish coalescing (`??`) and optional chaining (`?.`) operators appropriately
+- Prefix unused variables with underscore (e.g., \_unusedParam)
+
+# JavaScript Best Practices
+
+- Use `const` for all variables that aren't reassigned, `let` otherwise
+- Don't use `await` in return statements (return the Promise directly)
+- Always use curly braces for control structures, even for single-line blocks
+- Prefer object spread (e.g. `{ ...args }`) over `Object.assign`
+- Use rest parameters instead of `arguments` object
+- Use template literals instead of string concatenation
+
+# Import Organization
+
+- Keep imports at the top of the file
+- Group imports in this order: `built-in → external → internal → parent → sibling → index → object → type`
+- Add blank lines between import groups
+- Sort imports alphabetically within each group
+- Avoid duplicate imports
+- Avoid circular dependencies
+- Ensure member imports are sorted (e.g., `import { A, B, C } from 'module'`)
+
+# Console Usage
+
+- Console statements are allowed but should be used judiciously
+
+**Keep in Mind**: The code will be parsed using TypeScript compiler with strict type checking enabled and should adhere to modern ECMAScript standards.

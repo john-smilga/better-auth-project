@@ -1,0 +1,36 @@
+---
+globs: **/*.py
+alwaysApply: false
+---
+# Project Structure
+
+Always follow the structure guide in `docs/structure/django.md`. If this file does not exist, follow the patterns of the existing project.
+
+## Key Rules
+
+- **All file names must use snake_case** (Python convention)
+  - ✅ `user_service.py`, `store_serializer.py`, `auth_permissions.py`
+  - ❌ `UserService.py`, `storeSerializer.py`, `authPermissions.py`
+  - Exception: Django app names use lowercase with underscores (e.g., `user_auth`, `store_management`)
+
+- **Apps are domain-based, not URL-based**
+  - ✅ `apps/auth/`, `apps/stores/`, `apps/products/`
+  - ❌ `apps/api/stores/`
+
+- **Tests are organized by layer within each app**
+  ```
+  apps/stores/tests/
+  ├── test_models.py
+  ├── test_serializers.py
+  ├── test_views.py
+  ├── test_services.py
+  └── test_permissions.py
+  ```
+
+- **Views are thin, services contain business logic**
+  - Views orchestrate: authenticate → authorize → call service → serialize response
+  - All business rules live in `services/` modules
+
+- **URLs compose app functionality, but apps don't know about URL structure**
+
+When creating new apps, models, serializers, views, services, or permissions, always check `docs/structure/django.md` for the complete structure and patterns.

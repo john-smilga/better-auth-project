@@ -1,0 +1,95 @@
+---
+globs: **/*.test.tsx, **/*.test.ts, **/*.spec.tsx, **/*.spec.ts, **/*.test.jsx, **/*.test.js, **/*.spec.jsx, **/*.spec.js
+alwaysApply: false
+---
+# React Testing Library – Best Practices (Cursor Rules)
+
+## 1. Prefer Role-Based Queries
+- Default to **getByRole**.
+- Always include **name:** when applicable.
+- Roles represent real user interaction.
+
+## 2. Avoid `getByLabelText` Unless Testing Accessibility
+- Modern UI patterns often break label associations.
+- Prefer role + name (e.g., textbox, combobox, checkbox).
+- Use label queries only when explicitly validating accessibility.
+
+## 3. Avoid Non-Semantic Queries
+Do NOT use unless absolutely necessary:
+- getByTestId
+- getByPlaceholderText
+- getByDisplayValue
+- container.querySelector
+
+Only acceptable when:
+- Component has no semantic role.
+- You are testing low-level UI primitives.
+
+## 4. Prefer `findBy*` for Async DOM Updates
+- Use findBy* when waiting for elements to appear or update.
+- Avoid unnecessary waitFor when findBy solves it.
+
+## 5. Use `userEvent` Instead of `fireEvent`
+- Simulates real user action.
+- fireEvent should only be used for low-level or custom events.
+
+## 6. Assert Visible Behavior, Not Internal Implementation
+Avoid:
+- Checking internal state or props.
+- Asserting classNames or DOM structure.
+- Mock function call counts unless it's a true integration point.
+
+Prefer:
+- Assertions on visible text, roles, and what the user sees.
+
+## 7. Use `within()` for Scoped Queries
+- Useful for tables, lists, repeated rows, or grouped elements.
+- Prevents selecting the wrong instance.
+
+## 8. Avoid Re-Querying the Same Element
+- Query once, store the reference, reuse it.
+
+## 9. Prefer Screen Queries Over Destructuring From Render
+- Improves readability and consistency.
+- Keeps tests flat and declarative.
+
+## 10. Use `waitFor` Only When `findBy*` Cannot Apply
+- Use for async effects that do not produce visible DOM nodes.
+- Do not overuse.
+
+## 11. Test Accessibility Interactions
+- Include keyboard navigation (Tab, Enter, Space).
+- Assert focus behavior.
+- Ensure elements have correct accessible names.
+
+## 12. Reset Mocks After Each Test
+- Prevents cross-test pollution.
+- Always clear or reset mocks, timers, and modules.
+
+## 13. Avoid Snapshot Testing
+- Snapshots are brittle and high-maintenance.
+- Prefer targeted, behavior-based assertions.
+
+## 14. Keep Tests Minimal and User-Focused
+- Test what matters to the actual user.
+- Avoid testing internal render logic or permutations.
+
+## 15. Avoid Mocking Timers When Possible
+- userEvent may break with mocked timers.
+- If timers must be mocked, be explicit and careful.
+
+# Summary (Copy/Paste)
+- Prefer getByRole + name
+- Avoid getByLabelText unless testing accessibility directly
+- Avoid test IDs and non-semantic selectors
+- Use userEvent instead of fireEvent
+- Prefer findBy* for async updates
+- Assert visible behavior, not implementation details
+- Use within() to scope queries
+- Reuse queried elements
+- Prefer screen.* over destructuring queries
+- Use waitFor sparingly
+- Test accessiblity behaviors
+- Clear mocks after each test
+- Avoid snapshots
+- Keep tests focused on user behavior

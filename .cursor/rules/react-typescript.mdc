@@ -1,0 +1,175 @@
+---
+globs:**/*.tsx, **/*.jsx
+alwaysApply: false
+---
+# React & Typescript
+
+I prefer states with discriminated unions. They're type-safe, prevent invalid state combinations, and TypeScript automatically narrows types.
+
+
+✅ Good:
+```ts
+type FieldState = { status: 'idle' | 'valid' | 'invalid' };
+```
+
+❌ Bad:
+
+```ts
+type BadFieldState = {
+  isIdle: boolean;
+  isValid: boolean;
+  isInvalid: boolean;
+};
+```
+
+✅ Good:
+
+```ts
+type AsyncState<T> = { status: 'loading' } | { status: 'success'; data: T } | { status: 'error'; error: string };
+```
+
+❌ Bad:
+
+```ts
+type BadAsyncState<T> = {
+  isLoading: boolean;
+  isError: boolean;
+  isSuccess: boolean;
+  data?: T;
+  error?: string;
+};
+```
+
+I prefer computing values in React components instead of storing computed values in state and updating them with useEffect.
+✅ Good:
+
+```ts
+function UserList({ users }: { users: User[] }) {
+  const activeUsers = users.filter((user) => user.isActive);
+  const totalCount = users.length;
+
+  return (
+    <div>
+      <p>
+        Active: {activeUsers.length} / {totalCount}
+      </p>
+      {/* ... */}
+    </div>
+  );
+}
+```
+
+❌ Bad - Extra state + useEffect:
+
+```ts
+function UserList({ users }: { users: User[] }) {
+  const [activeUsers, setActiveUsers] = useState<User[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+
+  useEffect(() => {
+    setActiveUsers(users.filter((user) => user.isActive));
+    setTotalCount(users.length);
+  }, [users]);
+
+  return (
+    <div>
+      <p>
+        Active: {activeUsers.length} / {totalCount}
+      </p>
+      {/* ... */}
+    </div>
+  );
+}
+```
+
+✅ Good - Derived from props/state:
+
+```ts
+function ProductCard({ price, discount }: { price: number; discount: number }) {
+  const finalPrice = price * (1 - discount);
+  const savings = price - finalPrice;
+
+  return (
+    <div>
+      Price: ${finalPrice} (Save ${savings})
+    </div>
+  );
+}
+```
+
+❌ Bad - Storing computed values:
+
+```ts
+function ProductCard({ price, discount }: { price: number; discount: number }) {
+  const [finalPrice, setFinalPrice] = useState(0);
+  const [savings, setSavings] = useState(0);
+
+  useEffect(() => {
+    setFinalPrice(price * (1 - discount));
+    setSavings(price - finalPrice);
+  }, [price, discount, finalPrice]);
+
+  return (
+    <div>
+      Price: ${finalPrice} (Save ${savings})
+    </div>
+  );
+}
+```
+
+Avoid having more than one useEffect in a component. Keep dependency arrays to two values or fewer. Don't create useEffects that depend on other useEffects.
+
+✅ Good:
+
+```ts
+function UserProfile({ userId }: { userId: string }) {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    fetchUser(userId).then(setUser);
+  }, [userId]);
+
+  return user ? <div>{user.name}</div> : <div>Loading...</div>;
+}
+```
+
+❌ Bad:
+
+```ts
+function UserProfile({ userId }: { userId: string }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [processed, setProcessed] = useState(null);
+
+  useEffect(() => {
+    fetchUser(userId).then(setUser);
+  }, [userId]);
+
+  useEffect(() => {
+    if (user) {
+      fetchPosts(userId).then(setPosts);
+    }
+  }, [userId, user]);
+
+  useEffect(() => {
+    if (user && posts.length > 0) {
+      processData(user, posts).then(setProcessed);
+    }
+  }, [user, posts]);
+}
+```
+
+
+## TypeScript Custom Types
+
+If you encounter complex types that are repeated throughout the codebase, create custom type aliases to simplify the workflow and improve readability. This reduces repetition and makes the code more maintainable.
+
+**Examples:**
+
+Instead of repeating `Dispatch<SetStateAction<T>>`, create a custom type:
+
+export type SetState<T> = Dispatch<SetStateAction<T>>;
+Instead of repeating `React.FormEventHandler<T>`, create a custom type:
+
+export type FormHandler<T = HTMLFormElement> = React.FormEventHandler<T>;
+Always prefer creating custom types for repeated complex type expressions to make the codebase cleaner and easier to work with.

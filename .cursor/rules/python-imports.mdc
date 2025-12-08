@@ -1,0 +1,114 @@
+---
+globs: **/*.py
+alwaysApply: false
+---
+
+# Python Import Patterns
+
+## Import Organization
+
+- **Prefer top-level imports** over function-level imports
+- **Import order**: Standard library → Third-party → Local modules
+- **Group imports** with blank lines between groups
+- **Sort imports** alphabetically within each group
+
+## Top-Level vs Function-Level Imports
+
+### ✅ Prefer Top-Level Imports
+
+**Use top-level imports** unless there's a specific reason not to:
+
+```python
+# ✅ GOOD: Top-level import
+from apps.auth.models import User
+
+def register_user(username: str, email: str, password: str) -> User:
+    """Register a new user."""
+    if User.objects.filter(email=email).exists():
+        raise ValueError("A user with this email already exists.")
+    # ...
+```
+
+**Benefits**:
+
+- Cleaner, more readable code
+- Import happens once at module load (better performance)
+- Direct type annotations (not string annotations)
+- Easier to see all dependencies at a glance
+
+### ❌ Avoid Function-Level Imports (Unless Necessary)
+
+**Only use function-level imports** when:
+
+1. **Circular import risk**: When importing at top-level would cause circular imports
+2. **Expensive imports**: When the import is expensive and rarely used
+3. **Optional dependencies**: When the import might not be available
+
+```python
+# ❌ BAD: Function-level import without good reason
+def register_user(username: str, email: str, password: str) -> "User":
+    from apps.auth.models import User  # Unnecessary function-level import
+    # ...
+```
+
+```python
+# ✅ GOOD: Function-level import for circular import avoidance
+def expensive_operation():
+    # Only import when needed (rarely called function)
+    from heavy_module import HeavyClass
+    # ...
+```
+
+## TYPE_CHECKING Pattern
+
+When using `TYPE_CHECKING` for type hints, still prefer top-level imports for runtime:
+
+```python
+# ✅ GOOD: TYPE_CHECKING for type hints, top-level for runtime
+from typing import TYPE_CHECKING
+
+from apps.auth.models import User  # Top-level import for runtime use
+
+if TYPE_CHECKING:
+    # Additional imports only needed for type checking
+    from typing import Protocol
+```
+
+```python
+# ❌ BAD: Using TYPE_CHECKING as excuse for function-level imports
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from apps.auth.models import User
+
+def register_user(...) -> "User":  # String annotation
+    from apps.auth.models import User  # Function-level import
+    # ...
+```
+
+## Type Annotations
+
+- **Prefer direct type annotations** over string annotations when possible
+- Use string annotations (`"User"`) only when necessary to avoid circular imports
+
+```python
+# ✅ GOOD: Direct type annotation
+from apps.auth.models import User
+
+def register_user(...) -> User:  # Direct type
+    # ...
+```
+
+```python
+# ❌ BAD: String annotation when not needed
+def register_user(...) -> "User":  # String annotation
+    from apps.auth.models import User
+    # ...
+```
+
+## Summary
+
+- **Default to top-level imports**
+- **Use function-level imports only when necessary** (circular imports, expensive imports, optional dependencies)
+- **Prefer direct type annotations** over string annotations
+- **Keep imports organized** and visible at the top of the file

@@ -1,0 +1,29 @@
+---
+globs:**/*.tsx, **/*.ts, **/*.jsx, **/*.js
+alwaysApply: false
+---
+# Project Structure
+
+Always follow the structure guide in `docs/structure/nextjs.md`. If this file does not exist, follow the patterns of the existing project.
+
+## Key Rules
+
+- **All file names must use kebab-case** (ESLint Unicorn requirement)
+  - ✅ `login-form.tsx`, `use-login-mutation.ts`, `auth-store.ts`
+  - ❌ `LoginForm.tsx`, `useLoginMutation.ts`, `authStore.ts`
+  - Exception: Next.js route files (`page.tsx`, `layout.tsx`) remain as-is
+
+- **Features are domain-based, not route-based**
+  - ✅ `features/stores/`, `features/products/`
+  - ❌ `features/dashboard/stores/`
+
+- **Components live in folders with side-by-side tests**
+  ```
+  features/auth/components/login-form/
+  ├── login-form.tsx
+  └── login-form.test.tsx
+  ```
+
+- **Routes compose features, but features don't know about routes**
+
+When creating new features, components, queries, or stores, always check `docs/structure/nextjs.md` for the complete structure and patterns.

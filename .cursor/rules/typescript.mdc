@@ -1,0 +1,196 @@
+---
+globs: **/*.ts, **/*.tsx
+alwaysApply: false
+---
+# PROJECT STRUCTURE
+
+- Respect the existing project structure, for example:
+  - `app/` or `pages/`
+  - `components/`
+  - `hooks/`
+  - `lib/` or `utils/`
+  - `types/` or `src/types` or `@/types`
+  - `styles/`
+- Do not change routing conventions (App Router vs Pages Router) unless explicitly asked.
+- Keep components focused; if a component becomes large or complex, suggest splitting it into smaller components or hooks.
+
+---
+
+# TYPESCRIPT BEST PRACTICES
+
+## Type Safety & Configuration
+
+- Assume TypeScript is configured in **strict mode** with flags such as:
+  - `strict: true`
+  - `noImplicitAny: true`
+  - `strictNullChecks: true`
+  - `strictFunctionTypes: true`
+  - `strictBindCallApply: true`
+  - `strictPropertyInitialization: true`
+  - `noImplicitThis: true`
+  - `alwaysStrict: true`
+  - `exactOptionalPropertyTypes: true`
+- Write code that compiles cleanly under these strict settings.
+- Never use `// @ts-ignore` or `// @ts-expect-error` without a **clear, explanatory comment** describing why it is necessary and why it is safe.
+- Treat `--noEmitOnError` as effectively enabled: write code so that **no TypeScript errors** remain.
+
+## Type Definitions
+
+- **Do not ever use `any`. Ever.**
+  - If you feel you must use `any`, use `unknown` instead and narrow it properly.
+- Explicitly type:
+  - Function parameters
+  - Return types
+  - Object literals (where not trivially inferred)
+- Do **not** use `enum`. If you feel tempted to use an enum, use a **union of string/number literals** instead.
+- Use `readonly` modifiers for immutable properties and arrays when appropriate.
+- Leverage TypeScript’s standard utility types:
+  - `Partial`, `Required`, `Pick`, `Omit`, `Record`, etc.
+- Use **discriminated unions** with exhaustiveness checking for complex state and type narrowing (e.g., in reducers, state machines, or status objects).
+
+## Advanced Patterns
+
+- Implement proper **generics** with appropriate constraints where generics improve type safety and reduce duplication.
+- Use **mapped types** and **conditional types** to avoid repetitive type definitions where it improves clarity.
+- Leverage `const` assertions for literal types when you need exact value-level typing.
+- Use **branded/nominal types** for type-level validation (e.g., IDs, opaque tokens) when it increases safety without harming readability.
+
+## Code Organization (Types)
+
+- Organize types in dedicated files (e.g., `types.ts`) or alongside implementations, following existing conventions.
+- Use a central `types.ts` file or a `src/types` (or similar) directory for **shared** types that are reused across modules.
+- Document complex or non-obvious types with short JSDoc comments to explain intent and usage.
+
+---
+
+# REACT & NEXT.JS RULES
+
+- Use **functional components** and React hooks; do not introduce new class components.
+- Follow React hooks rules:
+  - Call hooks only at the top level of React components or custom hooks.
+  - Do not call hooks conditionally.
+- Extract reusable logic into custom hooks under `hooks/` when appropriate.
+- For Next.js:
+  - Respect existing use of App Router (`app/`) vs Pages Router (`pages/`).
+  - Do not change server/client component boundaries unless explicitly requested.
+  - Follow existing data fetching patterns (e.g., `fetch`, SWR, React Query, or project-specific utilities).
+- Prefer **typed props** and clear component interfaces over relying solely on inference when the component is exported.
+
+---
+
+# ESLINT, UNICORN & CUSTOM RULES
+
+- All code must be written to **pass ESLint** as configured in this repo, including:
+  - Core ESLint rules
+  - TypeScript ESLint rules
+  - **Unicorn** rules
+  - Any **custom rules** defined for the project
+- Assume `npm run lint`, `yarn lint`, or `pnpm lint` will run after your changes.
+
+## ESLint Behavior
+
+- Do not leave unused variables, unused imports, or unreachable code.
+- Avoid disabling ESLint rules with `// eslint-disable` comments unless explicitly requested or clearly justified in a comment.
+- Follow existing style for:
+  - Import order and grouping
+  - Quote style
+  - Semicolons
+  - Spacing and naming conventions
+- Prefer named exports/imports consistent with the current codebase.
+
+## Unicorn Mindset
+
+- Prefer clear, explicit code that aligns with Unicorn’s focus on:
+  - Modern language features
+  - Self-documenting identifiers (no cryptic abbreviations)
+  - Safer APIs and patterns
+- When unsure, choose the option that is **safer, more explicit, and more consistent** with existing patterns.
+
+---
+
+# PROTECTED CONFIG FILES
+
+Treat the following files as **protected** and do not alter them unless the user explicitly asks:
+
+- **ESLint configs:**
+  - `.eslintrc*`
+  - `eslint.config.*`
+  - `package.json` → `eslintConfig`
+- **TypeScript configs:**
+  - `tsconfig.json`
+  - Any `tsconfig.*.json` used for app/lib/test
+- **Next.js config:**
+  - `next.config.*`
+
+If code conflicts with these configs, **fix the code**, not the configuration.
+
+---
+
+# STYLING & UI
+
+- Follow the existing styling solution (e.g., CSS Modules, Tailwind, styled-components, or others).
+- Do not introduce a new styling library or CSS methodology unless explicitly requested.
+- Keep JSX readable:
+  - Avoid deeply nested JSX; extract subcomponents when it improves clarity.
+  - Minimize complex inline expressions in JSX; move them into variables or helper functions.
+
+---
+
+# API CALLS & DATA LAYER
+
+- Respect the current data-fetching and state management approach:
+  - If SWR, React Query, Redux, Zustand, or custom hooks are used, follow those patterns.
+  - Do not introduce a new state management library unless explicitly asked.
+- Separate presentational components from data-fetching logic where appropriate:
+  - Use hooks/utilities for data access.
+  - Keep “dumb” components focused on rendering.
+
+---
+
+# TESTING
+
+- When tests exist (Jest, Vitest, Testing Library, Cypress, Playwright, etc.):
+  - Update or add tests for non-trivial changes.
+  - Keep tests deterministic and simple to understand.
+- Follow the existing testing conventions for:
+  - File naming
+  - Folder layout
+  - Testing style (e.g., `describe/it`, `test`, RTL patterns)
+
+---
+
+# DIFF REQUIREMENTS
+
+- All diffs and suggested changes must:
+  - Be valid, strict TypeScript code with no `any`.
+  - Respect the project’s strict TS configuration and type safety rules.
+  - Pass ESLint with the current configuration (including Unicorn and custom rules).
+- Do **not**:
+  - Introduce unused imports or variables.
+  - Add `console.log` or other debug output unless explicitly requested (and then prefer removing it before finalization).
+  - Add commented-out code, scaffolding, or temporary debug code unless explicitly requested.
+  - Modify ESLint or TypeScript config files unless the user explicitly asks.
+
+---
+
+# PERFORMANCE & ACCESSIBILITY
+
+- Avoid unnecessary re-renders and heavy computations in render paths.
+- Use memoization (`React.memo`, `useMemo`, `useCallback`) only when it matches existing patterns and clearly improves performance.
+- Follow basic accessibility practices:
+  - Use semantic HTML elements.
+  - Use appropriate elements for interactivity (`button` instead of clickable `div`).
+  - Propagate and respect `aria-*` attributes and labels where used.
+
+---
+
+# FALLBACK RULES
+
+- Prefer **strict type safety** and **ESLint compliance** over clever or overly concise code.
+- Prefer **consistency with the existing codebase** over introducing new patterns.
+- Prefer **explicit, typed, and predictable** code over dynamic and implicit patterns.
+- When in doubt, choose the simplest implementation that:
+  - Has **no `any`**,
+  - Works under strict TypeScript settings,
+  - Passes ESLint (including Unicorn and custom rules),
+  - Does **not** modify ESLint or TypeScript configuration files.
