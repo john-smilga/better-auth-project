@@ -1,24 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@/lib/auth-client';
 import type { LoginFormData } from '../schemas';
+import { useAuthMutation } from './use-auth-mutation-wrapper';
 
 export const useLoginMutation = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: LoginFormData) => {
-      const result = await authClient.signIn.email({
-        email: data.email,
-        password: data.password,
-      });
-      if (result.error) {
-        throw new Error(result.error.message);
-      }
-      return result;
-    },
-    onSuccess: () => {
-      // Invalidate user query cache for client-side components
-      queryClient.invalidateQueries({ queryKey: ['current-user'] });
-    },
+  return useAuthMutation<LoginFormData>(async (data: LoginFormData) => {
+    return await authClient.signIn.email({
+      email: data.email,
+      password: data.password,
+    });
   });
 };

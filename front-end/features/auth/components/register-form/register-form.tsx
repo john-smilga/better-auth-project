@@ -5,14 +5,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
-import { FormInput } from '@/components/form';
+import { FormInput, FormError } from '@/components/form';
 import { registerSchema, type RegisterFormData } from '../../schemas';
 import { useRegisterMutation } from '../../queries';
-import { useRouter } from 'next/navigation';
 import { GithubSignInButton } from '../github-sign-in-button/github-sign-in-button';
 
 export function RegisterForm() {
-  const router = useRouter();
   const registerMutation = useRegisterMutation();
 
   const form = useForm<RegisterFormData>({
@@ -24,21 +22,8 @@ export function RegisterForm() {
     },
   });
 
-  const onSubmit = async (data: RegisterFormData) => {
-    try {
-      await registerMutation.mutateAsync(data);
-      router.push('/dashboard');
-    } catch (error) {
-      form.setError('root', {
-        message: error instanceof Error ? error.message : 'An error occurred',
-      });
-    }
-  };
-
-  const handleGitHubError = (error: Error) => {
-    form.setError('root', {
-      message: error.message,
-    });
+  const onSubmit = (data: RegisterFormData) => {
+    registerMutation.mutate(data);
   };
 
   return (
@@ -50,7 +35,8 @@ export function RegisterForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className='space-y-4'>
-            {form.formState.errors.root && <div className='text-sm text-destructive'>{form.formState.errors.root.message}</div>}
+            {form.formState.errors.root && <FormError message={form.formState.errors.root.message} />}
+            {registerMutation.isError && <FormError message={registerMutation.error?.message} />}
             <FormInput control={form.control} name='name' label='Name' type='text' placeholder='John Doe' />
             <FormInput control={form.control} name='email' label='Email' type='email' placeholder='you@example.com' />
             <FormInput control={form.control} name='password' label='Password' type='password' placeholder='••••••••' />
@@ -67,7 +53,7 @@ export function RegisterForm() {
                 <span className='bg-background px-2 text-muted-foreground'>Or continue with</span>
               </div>
             </div>
-            <GithubSignInButton callbackURL='/dashboard' onError={handleGitHubError} className='w-full' />
+            <GithubSignInButton callbackURL='/dashboard' className='w-full' />
           </CardFooter>
         </form>
       </Form>

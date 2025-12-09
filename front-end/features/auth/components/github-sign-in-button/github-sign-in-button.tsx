@@ -6,22 +6,14 @@ import { useGithubSignInMutation } from '../../queries/use-github-sign-in-mutati
 
 interface GithubSignInButtonProps {
   callbackURL?: string;
-  onError?: (error: Error) => void;
   className?: string;
 }
 
-export function GithubSignInButton({ callbackURL = '/dashboard', onError, className }: GithubSignInButtonProps) {
+export function GithubSignInButton({ callbackURL = '/dashboard', className }: GithubSignInButtonProps) {
   const githubSignInMutation = useGithubSignInMutation();
 
-  const handleGitHubSignIn = async () => {
-    try {
-      await githubSignInMutation.mutateAsync({ callbackURL });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error : new Error('Failed to sign in with GitHub');
-      if (onError) {
-        onError(errorMessage);
-      }
-    }
+  const handleGitHubSignIn = () => {
+    githubSignInMutation.mutate({ callbackURL });
   };
 
   return (
