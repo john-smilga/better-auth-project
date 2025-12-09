@@ -1,4 +1,4 @@
-import { authClient } from '@/lib/auth-client';
+import { authClient } from '@/lib/better-auth/auth-client';
 
 import type { LoginFormData } from '../schemas';
 import { useAuthMutation } from './use-auth-mutation-wrapper';

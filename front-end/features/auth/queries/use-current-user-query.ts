@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { authClient } from '@/lib/auth-client';
+import { authClient } from '@/lib/better-auth/auth-client';
 
 export const useCurrentUserQuery = () => {
   return useQuery({

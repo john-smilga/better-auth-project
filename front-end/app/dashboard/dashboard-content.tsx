@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { authClient } from '@/lib/auth-client';
+import { authClient } from '@/lib/better-auth/auth-client';
 import { user } from '@/lib/db/schema';
 
 type User = InferSelectModel<typeof user>;
@@ -53,7 +53,7 @@ export function DashboardContent({ user }: { readonly user: User }) {
           {user.image && (
             <div>
               <p className='text-sm font-medium text-muted-foreground'>Image</p>
-              <Image src={user.image} alt='Profile' className='mt-2 h-20 w-20 rounded-full' width={80} height={80} />
+              <Image src={user.image} alt='Profile' className='mt-2 h-20 w-20 rounded-full' width={80} height={80} loading='eager' />
             </div>
           )}
           <div>
