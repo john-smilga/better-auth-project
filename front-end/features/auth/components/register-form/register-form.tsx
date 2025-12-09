@@ -9,6 +9,7 @@ import { FormInput } from '@/components/form';
 import { registerSchema, type RegisterFormData } from '../../schemas';
 import { useRegisterMutation } from '../../queries';
 import { useRouter } from 'next/navigation';
+import { GithubSignInButton } from '../github-sign-in-button/github-sign-in-button';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -34,6 +35,12 @@ export function RegisterForm() {
     }
   };
 
+  const handleGitHubError = (error: Error) => {
+    form.setError('root', {
+      message: error.message,
+    });
+  };
+
   return (
     <Card className='w-full max-w-md'>
       <CardHeader>
@@ -48,10 +55,19 @@ export function RegisterForm() {
             <FormInput control={form.control} name='email' label='Email' type='email' placeholder='you@example.com' />
             <FormInput control={form.control} name='password' label='Password' type='password' placeholder='••••••••' />
           </CardContent>
-          <CardFooter className='mt-6'>
+          <CardFooter className='flex flex-col gap-4 mt-6'>
             <Button type='submit' className='w-full' disabled={registerMutation.isPending}>
               {registerMutation.isPending ? 'Creating account...' : 'Create Account'}
             </Button>
+            <div className='relative w-full'>
+              <div className='absolute inset-0 flex items-center'>
+                <span className='w-full border-t' />
+              </div>
+              <div className='relative flex justify-center text-xs uppercase'>
+                <span className='bg-background px-2 text-muted-foreground'>Or continue with</span>
+              </div>
+            </div>
+            <GithubSignInButton callbackURL='/dashboard' onError={handleGitHubError} className='w-full' />
           </CardFooter>
         </form>
       </Form>
