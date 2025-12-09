@@ -1,4 +1,5 @@
 import 'dotenv/config';
+
 import postgres from 'postgres';
 
 const connectionString = process.env.DATABASE_URL!;
@@ -28,8 +29,10 @@ async function checkTables() {
   } catch (error) {
     console.error('Error checking tables:', error);
     await client.end();
+    // eslint-disable-next-line unicorn/no-process-exit
     process.exit(1);
   }
 }
 
+// eslint-disable-next-line unicorn/prefer-top-level-await
 checkTables();

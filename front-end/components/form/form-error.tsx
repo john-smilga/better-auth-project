@@ -1,6 +1,6 @@
 type FormErrorProps = {
-  message?: string;
-  className?: string;
+  readonly message?: string;
+  readonly className?: string;
 };
 
 export function FormError({ message, className }: FormErrorProps) {

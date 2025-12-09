@@ -1,7 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+
 import { checkBetterAuthError, extractErrorMessage } from '@/lib/utils';
 
 /**

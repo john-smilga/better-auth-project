@@ -1,4 +1,5 @@
 import 'dotenv/config';
+
 import postgres from 'postgres';
 
 const connectionString = process.env.DATABASE_URL!;
@@ -27,8 +28,10 @@ async function cleanDatabase() {
   } catch (error) {
     console.error('Error cleaning database:', error);
     await client.end();
+    // eslint-disable-next-line unicorn/no-process-exit
     process.exit(1);
   }
 }
 
+// eslint-disable-next-line unicorn/prefer-top-level-await
 cleanDatabase();

@@ -1,6 +1,7 @@
 import { type z } from 'zod';
-import { HttpError, normalizeError } from './errors';
+
 import { httpClient } from './client';
+import { HttpError, normalizeError } from './errors';
 
 type HttpRequestOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -20,7 +21,7 @@ export const httpRequest = async <T extends z.ZodType>(endpoint: string, schema:
     });
 
     if (!response.ok) {
-      throw new HttpError(response.status, response.statusText, await response.json().catch(() => undefined));
+      throw new HttpError(response.status, response.statusText, await response.json().catch(() => {}));
     }
 
     const data = await response.json();

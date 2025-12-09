@@ -1,13 +1,15 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+
+import { FormError, FormInput } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
-import { FormInput, FormError } from '@/components/form';
-import { loginSchema, type LoginFormData } from '../../schemas';
+
 import { useLoginMutation } from '../../queries';
+import { type LoginFormData, loginSchema } from '../../schemas';
 import { GithubSignInButton } from '../github-sign-in-button/github-sign-in-button';
 
 export function LoginForm() {
@@ -17,6 +19,7 @@ export function LoginForm() {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: 'johnsmilga@gmail.com',
+      // eslint-disable-next-line sonarjs/no-hardcoded-passwords
       password: 'secret123',
     },
   });

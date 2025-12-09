@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 import { useCurrentUserQuery } from '@/features/auth/queries';
+
 import { DashboardContent } from './dashboard-content';
 
 export default function DashboardPage() {

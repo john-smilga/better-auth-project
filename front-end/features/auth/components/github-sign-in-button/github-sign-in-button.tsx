@@ -2,11 +2,12 @@
 
 import { Button } from '@/components/ui/button';
 import { GithubIcon } from '@/components/ui/github-icon';
+
 import { useGithubSignInMutation } from '../../queries/use-github-sign-in-mutation';
 
 type GithubSignInButtonProps = {
-  callbackURL?: string;
-  className?: string;
+  readonly callbackURL?: string;
+  readonly className?: string;
 };
 
 export function GithubSignInButton({ callbackURL = '/dashboard', className }: GithubSignInButtonProps) {

@@ -1,15 +1,17 @@
 'use client';
 
+import { InferSelectModel } from 'drizzle-orm';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { authClient } from '@/lib/auth-client';
-import { useRouter } from 'next/navigation';
-import { InferSelectModel } from 'drizzle-orm';
 import { user } from '@/lib/db/schema';
 
 type User = InferSelectModel<typeof user>;
 
-export function DashboardContent({ user }: { user: User }) {
+export function DashboardContent({ user }: { readonly user: User }) {
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -51,7 +53,7 @@ export function DashboardContent({ user }: { user: User }) {
           {user.image && (
             <div>
               <p className='text-sm font-medium text-muted-foreground'>Image</p>
-              <img src={user.image} alt='Profile' className='mt-2 h-20 w-20 rounded-full' />
+              <Image src={user.image} alt='Profile' className='mt-2 h-20 w-20 rounded-full' width={80} height={80} />
             </div>
           )}
           <div>

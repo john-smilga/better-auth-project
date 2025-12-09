@@ -1,5 +1,6 @@
-import { RegisterForm } from '@/features/auth/components';
 import Link from 'next/link';
+
+import { RegisterForm } from '@/features/auth/components';
 
 export default function RegisterPage() {
   return (
