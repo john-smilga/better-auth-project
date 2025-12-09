@@ -1,31 +1,23 @@
-'use client';
-
 import { InferSelectModel } from 'drizzle-orm';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { authClient } from '@/lib/auth-client';
+import { logoutAction } from '@/features/auth/actions';
 import { user } from '@/lib/db/schema';
 
 type User = InferSelectModel<typeof user>;
 
 export function DashboardContent({ user }: { readonly user: User }) {
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    await authClient.signOut();
-    router.push('/login');
-  };
-
   return (
     <div className='container mx-auto p-6'>
       <div className='mb-6 flex items-center justify-between'>
         <h1 className='text-3xl font-bold'>Dashboard</h1>
-        <Button onClick={handleLogout} variant='outline'>
-          Logout
-        </Button>
+        <form action={logoutAction}>
+          <Button type='submit' variant='outline'>
+            Logout
+          </Button>
+        </form>
       </div>
 
       <Card>
