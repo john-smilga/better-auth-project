@@ -2,13 +2,12 @@
 
 import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { checkBetterAuthError, extractErrorMessage } from '@/lib/utils';
 
 /**
  * Wraps auth mutations with automatic navigation and error handling
  */
-export function useAuthMutation<TVariables>(
-  mutationFn: (variables: TVariables) => Promise<unknown>,
-) {
+export function useAuthMutation<TVariables>(mutationFn: (variables: TVariables) => Promise<void>) {
   const queryClient = useQueryClient();
   const router = useRouter();
 
@@ -16,23 +15,9 @@ export function useAuthMutation<TVariables>(
     mutationFn: async (variables: TVariables) => {
       try {
         const result = await mutationFn(variables);
-        // Check for better-auth error in result (if result has error property)
-        if (
-          result &&
-          typeof result === 'object' &&
-          'error' in result &&
-          result.error &&
-          typeof result.error === 'object' &&
-          'message' in result.error &&
-          typeof result.error.message === 'string'
-        ) {
-          throw new Error(result.error.message);
-        }
+        checkBetterAuthError(result);
       } catch (error) {
-        // Extract error message from better-auth or use default
-        const errorMessage =
-          error instanceof Error ? error.message : 'There was an error';
-        throw new Error(errorMessage);
+        throw new Error(extractErrorMessage(error));
       }
     },
     onSuccess: () => {
@@ -41,4 +26,3 @@ export function useAuthMutation<TVariables>(
     },
   });
 }
-
