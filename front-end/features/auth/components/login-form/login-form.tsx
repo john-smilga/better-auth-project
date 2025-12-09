@@ -1,6 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { FormError, FormInput } from '@/components/form';
@@ -8,12 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
 
-import { useLoginMutation } from '../../queries';
+import { loginAction } from '../../actions';
 import { type LoginFormData, loginSchema } from '../../schemas';
 import { GithubSignInButton } from '../github-sign-in-button/github-sign-in-button';
 
 export function LoginForm() {
-  const loginMutation = useLoginMutation();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -25,7 +28,16 @@ export function LoginForm() {
   });
 
   const onSubmit = (data: LoginFormData) => {
-    loginMutation.mutate(data);
+    startTransition(async () => {
+      const result = await loginAction(data);
+
+      if (result.error) {
+        form.setError('root', { message: result.error });
+        return;
+      }
+
+      router.push('/dashboard');
+    });
   };
 
   return (
@@ -38,13 +50,12 @@ export function LoginForm() {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className='space-y-4'>
             {form.formState.errors.root && <FormError message={form.formState.errors.root.message} />}
-            {loginMutation.isError && <FormError message={loginMutation.error?.message} />}
             <FormInput control={form.control} name='email' label='Email' type='email' placeholder='you@example.com' />
             <FormInput control={form.control} name='password' label='Password' type='password' placeholder='••••••••' />
           </CardContent>
           <CardFooter className='flex flex-col gap-4 mt-6'>
-            <Button type='submit' className='w-full' disabled={loginMutation.isPending}>
-              {loginMutation.isPending ? 'Signing in...' : 'Sign In'}
+            <Button type='submit' className='w-full' disabled={isPending}>
+              {isPending ? 'Signing in...' : 'Sign In'}
             </Button>
             <div className='relative w-full'>
               <div className='absolute inset-0 flex items-center'>
