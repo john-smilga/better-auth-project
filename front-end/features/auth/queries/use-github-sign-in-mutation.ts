@@ -1,9 +1,9 @@
 import { authClient } from '@/lib/auth-client';
 import { useAuthMutation } from './use-auth-mutation-wrapper';
 
-interface GithubSignInOptions {
+type GithubSignInOptions = {
   callbackURL?: string;
-}
+};
 
 export const useGithubSignInMutation = () => {
   return useAuthMutation<GithubSignInOptions>(async (options: GithubSignInOptions = {}) => {

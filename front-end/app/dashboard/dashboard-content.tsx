@@ -4,16 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
+import { InferSelectModel } from 'drizzle-orm';
+import { user } from '@/lib/db/schema';
 
-type User = {
-  id: string;
-  name: string | null;
-  email: string;
-  emailVerified: boolean;
-  image?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
+type User = InferSelectModel<typeof user>;
 
 export function DashboardContent({ user }: { user: User }) {
   const router = useRouter();

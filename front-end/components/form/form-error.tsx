@@ -1,7 +1,7 @@
-interface FormErrorProps {
+type FormErrorProps = {
   message?: string;
   className?: string;
-}
+};
 
 export function FormError({ message, className }: FormErrorProps) {
   if (!message) {
